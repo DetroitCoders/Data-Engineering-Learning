@@ -57,3 +57,17 @@ def main(request):
         return {"status": "success", "message": "Data ingested"}, 200
     else:
         return {"status": "error", "errors": errors}, 500
+
+if __name__ == "__main__":
+    # When GitHub Actions runs 'python ingestion/main.py', this block executes
+    print("🚀 Starting manual ingestion run via GitHub Actions...")
+    
+    # We pass None because we aren't using the 'request' object from a Flask/HTTP trigger
+    result, status = main(None)
+    
+    print(f"Status: {status}")
+    print(f"Result: {result}")
+    
+    # If it failed, exit with an error code so GitHub shows a 'Red X'
+    if status != 200:
+        exit(1)

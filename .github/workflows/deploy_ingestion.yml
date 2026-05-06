@@ -1,0 +1,35 @@
+name: Daily Weather Ingestion
+
+on:
+  schedule:
+    # 12:10 AM UTC daily
+    - cron: '10 0 * * *'
+  workflow_dispatch: # Allows you to run it manually for testing
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: |
+          pip install -r ingestion/requirements.txt
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
+      - name: Run Ingestion Script
+        env:
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+          GCP_DATASET_ID: ${{ secrets.GCP_DATASET_ID }}
+        run: |
+          python ingestion/main.py
