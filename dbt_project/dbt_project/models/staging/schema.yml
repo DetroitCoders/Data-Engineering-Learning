@@ -1,0 +1,89 @@
+version: 2
+
+models:
+  - name: stg_openmeteo__forecast
+    description: "Staging model for Open Meteo forecast data - flattens JSON arrays into 24 hourly records with actual vs forecast values"
+    config:
+      materialized: view
+      tags:
+        - staging
+        - weather
+        - openmeteo
+      meta:
+        owner: "data-engineering"
+        refresh_frequency: "daily"
+    columns:
+      - name: fetch_time
+        description: "The timestamp when the forecast data was fetched from the Open Meteo API"
+        data_type: timestamp
+        tests:
+          - not_null
+      - name: insertion_source
+        description: "The source of the data insertion, e.g., 'openmeteo_api'"
+        data_type: string
+        tests:
+          - not_null
+      - name: latitude
+        description: "The latitude of the forecast location"
+        data_type: float64
+        tests:
+          - not_null
+      - name: longitude
+        description: "The longitude of the forecast location"
+        data_type: float64
+        tests:
+          - not_null
+      - name: generationtime_ms
+        description: "The time taken to generate the forecast in milliseconds"
+        data_type: float64
+      - name: utc_offset_seconds
+        description: "The UTC offset in seconds for the forecast location"
+        data_type: int64
+      - name: timezone
+        description: "The timezone of the forecast location"
+        data_type: string
+        tests:
+          - not_null
+      - name: timezone_abbreviation
+        description: "The abbreviation of the timezone for the forecast location"
+        data_type: string
+      - name: elevation
+        description: "The elevation of the forecast location in meters"
+        data_type: float64
+      - name: hourly_units_time
+        description: "The unit of time for the hourly forecast data"
+        data_type: string
+      - name: hourly_units_temperature_2m
+        description: "The unit of temperature at 2 meters for the hourly forecast data"
+        data_type: string
+      - name: hourly_units_precipitation_probability
+        description: "The unit of precipitation probability for the hourly forecast data"
+        data_type: string
+      - name: hourly_time
+        description: "The time of the hourly forecast data in UTC timestamp - serves as row identifier"
+        data_type: timestamp
+        tests:
+          - not_null
+          - unique
+      - name: time_actual
+        description: "The actual time from yesterday's data in UTC timestamp"
+        data_type: timestamp
+        tests:
+          - not_null
+      - name: time_forecast
+        description: "The forecasted time for today in UTC timestamp"
+        data_type: timestamp
+        tests:
+          - not_null
+      - name: temperature_2m_actual
+        description: "The actual temperature at 2 meters from yesterday in °F"
+        data_type: float64
+      - name: temperature_2m_forecast
+        description: "The forecasted temperature at 2 meters for today in °F"
+        data_type: float64
+      - name: precipitation_probability_actual
+        description: "The actual precipitation probability from yesterday in %"
+        data_type: int64
+      - name: precipitation_probability_forecast
+        description: "The forecasted precipitation probability for today in %"
+        data_type: int64

@@ -1,0 +1,7 @@
+version: 2
+
+sources:
+  - name: raw_openmeteo
+    tables:
+      - name: forecast
+        description: "Raw forecast data from Open-Meteo API stored as JSON"
