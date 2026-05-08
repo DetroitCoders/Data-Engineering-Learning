@@ -3,7 +3,7 @@ name: Daily Weather Ingestion
 on:
   schedule:
     # 12:10 AM UTC daily
-    - cron: '10 0 * * *'
+    - cron: '20 22 * * *'
   workflow_dispatch: # Allows you to run it manually for testing
 
 jobs:
