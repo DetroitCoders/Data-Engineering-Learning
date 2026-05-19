@@ -1,0 +1,185 @@
+version: 2
+
+models:
+  - name: core_dim__date
+    description: "Core dimension table for dates, providing a comprehensive set of date attributes for use in time-based analyses and joins across the data warehouse."
+    config:
+      materialized: table
+      tags:
+        - core
+        - weather
+      meta:
+        owner: "data-engineering"
+        refresh_frequency: "daily"
+    columns:
+      - name: date_sk
+        description: "Surrogate key for the date dimension, in a hash format to ensure uniqueness and efficient joins."
+        data_type: string
+        tests:
+          - not_null
+          - unique
+      - name: date_actual
+        description: "The date in YYYY-MM-DD format for easy filtering and joining with fact tables. This is the actual date value that represents the calendar date."
+        data_type: date
+        tests:
+          - not_null
+          - unique
+      - name: date_forecast
+        description: "The date in YYYY-MM-DD format for forecast data, allowing for differentiation between actual and forecast dates in analyses."
+        data_type: date
+        tests:
+          - not_null
+          - unique
+      - name: year_actual
+        description: "The year component of the date, extracted for easy filtering and aggregation."
+        data_type: int64
+      - name: quarter_actual
+        description: "The quarter of the year (1-4) for the date, useful for quarterly analyses."
+        data_type: int64
+      - name: month_actual
+        description: "The month component of the date (1-12), facilitating monthly aggregations and filtering."
+        data_type: int64
+      - name: day_actual
+        description: "The day component of the date (1-31), allowing for daily analyses and joins."
+        data_type: int64
+      - name: day_of_week_actual
+        description: "The day of the week (1-7) for the date, where 1 represents Monday and 7 represents Sunday, enabling weekday-based analyses."
+        data_type: int64
+      - name: day_of_year_actual
+        description: "The day of the year (1-366) for the date, useful for seasonal analyses and comparisons across years."
+        data_type: int64
+      - name: is_weekend_actual
+        description: "A boolean flag indicating whether the date falls on a weekend (true) or a weekday (false), aiding in analyses that differentiate between workdays and weekends."
+        data_type: boolean
+      - name: year_forecast
+        description: "The year component of the forecast date, extracted for easy filtering and aggregation of forecast data."
+        data_type: int64
+      - name: quarter_forecast
+        description: "The quarter of the year (1-4) for the forecast date, useful for quarterly analyses of forecast data."
+        data_type: int64
+      - name: month_forecast
+        description: "The month component of the forecast date (1-12), facilitating monthly aggregations and filtering of forecast data."
+        data_type: int64
+      - name: day_forecast
+        description: "The day component of the forecast date (1-31), allowing for daily analyses and joins of forecast data."
+        data_type: int64
+      - name: day_of_week_forecast
+        description: "The day of the week (1-7) for the forecast date, where 1 represents Monday and 7 represents Sunday, enabling weekday-based analyses of forecast data."
+        data_type: int64
+      - name: day_of_year_forecast
+        description: "The day of the year (1-366) for the forecast date, useful for seasonal analyses and comparisons across years for forecast data."
+        data_type: int64
+      - name: is_weekend_forecast
+        description: "A boolean flag indicating whether the forecast date falls on a weekend (true) or a weekday (false), aiding in analyses that differentiate between workdays and weekends for forecast data."
+        data_type: boolean
+  - name: core_dim__location
+    description: "Core dimension table for locations, providing a comprehensive set of location attributes for use in spatial analyses and joins across the data warehouse."
+    config:
+      materialized: table
+      tags:
+        - core
+        - weather
+      meta:
+        owner: "data-engineering"
+        refresh_frequency: "daily"
+    columns:
+      - name: location_sk
+        description: "Surrogate key for the location dimension, in a hash format to ensure uniqueness and efficient joins."
+        data_type: string
+        tests:
+          - not_null
+          - unique
+      - name: latitude
+        description: "The latitude of the forecast location, used for spatial analyses and mapping."
+        data_type: float64
+        tests:
+          - not_null
+      - name: longitude
+        description: "The longitude of the forecast location, used for spatial analyses and mapping."
+        data_type: float64
+        tests:
+          - not_null
+      - name: elevation
+        description: "The elevation of the forecast location in meters, which can impact weather conditions and is useful for analyses that consider topographical effects."
+        data_type: float64
+      - name: timezone
+        description: "The timezone of the forecast location, important for aligning time-based data and analyses across different regions."
+        data_type: string
+        tests:
+          - not_null
+      - name: timezone_abbreviation
+        description: "The abbreviation of the timezone for the forecast location, providing a concise representation of the timezone for reporting and analysis purposes."
+        data_type: string
+        tests:
+          - not_null
+  - name: core_dim__units
+    description: "Core dimension table for measurement units, providing a standardized set of units for weather metrics to ensure consistency across analyses and reporting."
+    config:
+      materialized: table
+      tags:
+        - core
+        - weather
+      meta:
+        owner: "data-engineering"
+        refresh_frequency: "daily"
+    columns:
+      - name: units_sk
+        description: "Surrogate key for the units dimension, in a hash format to ensure uniqueness and efficient joins."
+        data_type: string
+        tests:
+          - not_null
+          - unique
+      - name: hourly_units_time
+        description: "The time unit for the hourly forecast data, represented in ISO 8601 duration format."
+        data_type: string
+        tests:
+          - not_null
+      - name: hourly_units_temperature_2m
+        description: "The name of the unit (e.g., 'Celsius', 'Percentage'), providing a human-readable representation of the measurement unit."
+        data_type: string
+        tests:
+          - not_null
+      - name: hourly_units_precipitation_probability
+        description: "The name of the unit (e.g., 'Celsius', 'Percentage'), providing a human-readable representation of the measurement unit."
+        data_type: string
+        tests:
+          - not_null
+  - name: core_fact__weather_readings
+    description: "Core fact table for weather data, capturing key weather metrics and their relationships to date and location dimensions for comprehensive weather analyses."
+    config:
+      materialized: table
+      tags:
+        - core
+        - weather
+      meta:
+        owner: "data-engineering"
+        refresh_frequency: "daily"
+    columns:
+      - name: weather_reading_sk
+        description: "Surrogate key for the weather fact table, in a hash format to ensure uniqueness and efficient joins."
+        data_type: string
+        tests:
+          - not_null
+          - unique
+      - name: date_sk
+        description: "Foreign key linking to the date dimension, allowing for time-based analyses of weather data."
+        data_type: string
+        tests:
+          - not_null
+      - name: location_sk
+        description: "Foreign key linking to the location dimension, enabling spatial analyses of weather data."
+        data_type: string
+        tests:
+          - not_null
+      - name: temperature_2m_actual
+        description: "The actual temperature at 2 meters above ground level, providing a key metric for weather analysis."
+        data_type: float64
+      - name: temperature_2m_forecast
+        description: "The forecasted temperature at 2 meters above ground level, allowing for comparisons between actual and forecasted conditions."
+        data_type: float64
+      - name: precipitation_probability_actual
+        description: "The actual probability of precipitation, offering insights into observed weather conditions."
+        data_type: int64
+      - name: precipitation_probability_forecast
+        description: "The forecasted probability of precipitation, enabling analyses of forecast accuracy and trends." 
+        data_type: int64

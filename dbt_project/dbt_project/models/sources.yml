@@ -5,3 +5,7 @@ sources:
     tables:
       - name: forecast
         description: "Raw forecast data from Open-Meteo API stored as JSON"
+  - name: analytics
+    tables:
+      - name: stg_openmeteo__forecast
+        description: "Staging model for Open Meteo forecast data - flattens JSON arrays into 24 hourly records with actual vs forecast values"
