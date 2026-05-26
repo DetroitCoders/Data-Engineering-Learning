@@ -44,5 +44,5 @@ jobs:
 
       - name: Run dbt Incremental Models
         run: |
-          cd dbt_project/
+          cd dbt_project/dbt_project/
           dbt run
