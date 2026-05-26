@@ -1,0 +1,47 @@
+name: Incremental dbt Warehouse Load
+
+on:
+  workflow_dispatch: # For manual testing in the GitHub Actions UI
+  workflow_call:      # Allows the Weather Ingestion workflow to trigger this
+    secrets:
+      GCP_SA_KEY:
+        required: true
+      GCP_PROJECT_ID:
+        required: true
+      GCP_DATASET2_ID:
+        required: true
+
+jobs:
+  transform:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install dbt Dependencies
+        run: |
+          cd dbt_project/
+          pip install -r requirements.txt
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v3
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
+      - name: Generate dbt Profile from Template
+        env:
+          # Pull your pre-existing secrets into the environment scope
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+          GCP_DATASET2_ID: ${{ secrets.GCP_DATASET2_ID }}
+        run: |
+          mkdir -p ~/.dbt
+          envsubst < ci/profiles.template.yml > ~/.dbt/profiles.yml
+
+      - name: Run dbt Incremental Models
+        run: |
+          dbt run

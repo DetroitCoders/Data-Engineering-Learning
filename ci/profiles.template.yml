@@ -1,0 +1,10 @@
+default:
+  target: prod
+  outputs:
+    prod:
+      type: bigquery
+      method: oauth
+      project: "$GCP_PROJECT_ID"   # Injected dynamically from your GitHub secrets
+      dataset: "$GCP_DATASET2_ID"   # Injected dynamically from your GitHub secrets
+      threads: 4
+      timeout_seconds: 300

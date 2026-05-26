@@ -33,3 +33,14 @@ jobs:
           GCP_DATASET_ID: ${{ secrets.GCP_DATASET_ID }}
         run: |
           python ingestion/main.py
+
+  # ==========================================================
+  # JOB BELOW KICKS OFF THE SECOND WORKFLOW
+  # ==========================================================
+  run-transformations:
+    needs: ingest
+    uses: ./.github/workflows/deploy_warehouse_load.yml
+    secrets:
+      GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+      GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+      GCP_DATASET2_ID: ${{ secrets.GCP_DATASET2_ID }}
