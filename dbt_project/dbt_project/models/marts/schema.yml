@@ -1,0 +1,50 @@
+version: 2
+
+models:
+  - name: mart_weather_historical_trends
+    description: "A fact table that aggregates historical weather trends by location and date, providing key metrics such as average temperature and precipitation probability for trend analysis and reporting."
+    config:
+      materialized: table
+      tags:
+        - mart
+        - weather
+      meta:
+        owner: "data-engineering"
+        refresh_frequency: "daily"
+    columns:
+      - name: trend_id
+        description: "Surrogate key for the trends fact table, generated as a hash of the location and date to ensure uniqueness and efficient joins."
+        data_type: string
+        tests:
+          - not_null
+          - unique
+      - name: reading_date
+        description: "The date for which the weather trends are aggregated, serving as a key dimension for time-based analysis."
+        tests:
+          - not_null
+        data_type: date
+      - name: location_latitude
+        description: "The latitude of the location for which the weather trends are aggregated, providing a key dimension for spatial analysis."
+        tests:
+          - not_null
+        data_type: float64
+      - name: location_longitude
+        description: "The longitude of the location for which the weather trends are aggregated, providing a key dimension for spatial analysis."
+        tests:
+          - not_null
+        data_type: float64
+      - name: avg_temperature
+        description: "The average temperature for the day at 2 meters above ground level, providing a key metric for analyzing weather trends over time."
+        data_type: float64
+      - name: max_temperature
+        description: "The maximum temperature for the day at 2 meters above ground level, offering insights into daily temperature extremes for trend analysis."
+        data_type: float64
+      - name: min_temperature
+        description: "The minimum temperature for the day at 2 meters above ground level, helping to understand daily temperature lows for comprehensive trend analysis."
+        data_type: float64
+      - name: avg_precipitation_chance
+        description: "The average precipitation probability for the day, providing a key metric for analyzing trends in precipitation likelihood over time."
+        data_type: float64
+      - name: mart_updated_at
+        description: "Timestamp indicating when the trend record was last updated, useful for auditing and ensuring data freshness in the mart."
+        data_type: timestamp
