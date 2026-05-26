@@ -1,3 +1,12 @@
+{{
+    config(
+        materialized='incremental',
+        unique_key='weather_reading_sk',
+        incremental_strategy='merge', 
+        cluster_by=['date_sk']
+    )
+}}
+
 with stage_data as (
   select *
   from {{ source('analytics', 'stg_openmeteo__forecast') }}
@@ -28,8 +37,8 @@ weather_readings_core as (
         stage_data.precipitation_probability_forecast as precipitation_probability_forecast
     from stage_data
     left join dates 
-        on DATE(stage_data.time_actual) = dates.date_actual
-        and DATE(stage_data.time_forecast) = dates.date_forecast
+        on DATE(stage_data.time_actual, stage_data.timezone) = dates.date_actual
+        and DATE(stage_data.time_forecast, stage_data.timezone) = dates.date_forecast
     left join locations
         on stage_data.latitude = locations.latitude
         and stage_data.longitude = locations.longitude
@@ -40,6 +49,12 @@ weather_readings_core as (
         on stage_data.hourly_units_time = units.hourly_units_time
         and stage_data.hourly_units_temperature_2m = units.hourly_units_temperature_2m
         and stage_data.hourly_units_precipitation_probability = units.hourly_units_precipitation_probability
+
+    {% if is_incremental() %}
+      where stage_data.local_date > DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY)
+    {% endif %}
+
+    qualify row_number() over (partition by weather_reading_sk order by stage_data.fetch_time desc) = 1
 )
 
 select * from weather_readings_core

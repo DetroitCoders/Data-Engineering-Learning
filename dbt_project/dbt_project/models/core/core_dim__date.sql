@@ -1,3 +1,11 @@
+{{
+    config(
+        materialized='incremental',
+        unique_key='date_sk',
+        incremental_strategy='merge'
+    )
+}}
+
 with stage_data as (
   select *
   from {{ source('analytics', 'stg_openmeteo__forecast') }}
@@ -5,8 +13,9 @@ with stage_data as (
 
 date_dim as (
   select
-    distinct date(stage_data.time_actual) as date_actual,
-    date(stage_data.time_forecast) as date_forecast
+    distinct date(stage_data.time_actual, stage_data.timezone) as date_actual,
+    date(stage_data.time_forecast, stage_data.timezone) as date_forecast,
+    stage_data.local_date as local_date
   from stage_data
 )
 
@@ -31,3 +40,12 @@ select
     EXTRACT(dayofyear from date_dim.date_forecast) as dayofyear_forecast,
     CASE WHEN EXTRACT(dayofweek from date_dim.date_forecast) IN (1, 5) THEN false ELSE true END as is_weekend_forecast
 from date_dim
+        
+{% if is_incremental() %}
+where date_dim.local_date >= (select max(date_dim.local_date) from {{ this }})
+{% endif %}
+
+qualify row_number() over (
+  partition by date_sk 
+  order by local_date desc
+) = 1
