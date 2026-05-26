@@ -61,6 +61,7 @@ select
   hourly_units_time,
   hourly_units_temperature_2m,
   hourly_units_precipitation_probability,
+  DATE(time_actual) as local_date,
   TIMESTAMP(time_actual, timezone) as hourly_time,
   TIMESTAMP(time_actual, timezone) as time_actual,
   TIMESTAMP(time_forecast, timezone) as time_forecast,

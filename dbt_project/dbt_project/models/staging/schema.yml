@@ -59,6 +59,11 @@ models:
       - name: hourly_units_precipitation_probability
         description: "The unit of precipitation probability for the hourly forecast data"
         data_type: string
+      - name: local_date
+        description: "The local date of the forecast data based on the timezone - used for incremental loading"
+        data_type: date
+        tests:
+          - not_null
       - name: hourly_time
         description: "The time of the hourly forecast data in UTC timestamp - serves as row identifier"
         data_type: timestamp
