@@ -1,0 +1,12 @@
+# This file was automatically generated
+type: bigquery
+name: bigquery_connection
+# Advanced Options, you probably don't want to change this
+buildOptions:
+  batchSize: 1000000
+options:
+  authenticator: service-account
+  location: US
+project: "${EVIDENCE_SECRET_PROJECT_ID}"
+dataset: "${EVIDENCE_SECRET_DATASET_ID}"
+table: "${EVIDENCE_SECRET_TABLE_NAME}"
