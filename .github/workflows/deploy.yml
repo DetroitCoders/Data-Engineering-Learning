@@ -25,7 +25,7 @@ jobs:
         with:
           node-version: 24
           cache: npm
-          cache-dependency-path: 'reporting/package-lock.json'
+          cache-dependency-path: 'reporting'
 
       - name: Install dependencies
         run: |
