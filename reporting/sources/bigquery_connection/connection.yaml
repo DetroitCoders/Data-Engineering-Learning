@@ -7,6 +7,3 @@ buildOptions:
 options:
   authenticator: service-account
   location: US
-project: "${EVIDENCE_SECRET_PROJECT_ID}"
-dataset: "${EVIDENCE_SECRET_DATASET_ID}"
-table: "${EVIDENCE_SECRET_TABLE_NAME}"

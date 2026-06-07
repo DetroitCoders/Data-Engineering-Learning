@@ -23,25 +23,25 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
 
       - name: Install dependencies
-        run: npm install
+        run: |
+          cd reporting/
+          npm install
 
       - name: build
         env:
-          BASE_PATH: '/${{ github.event.repository.name }}'
+          BASE_PATH: './build/${{ github.event.repository.name }}'
           ## Add and uncomment any environment variables here
           EVIDENCE_SOURCE__BIGQUERY_CONNECTION__AUTHENTICATOR: ${{ secrets.EVIDENCE_SOURCE__BIGQUERY_CONNECTION__AUTHENTICATOR }}
           EVIDENCE_SOURCE__BIGQUERY_CONNECTION__CLIENT_EMAIL: ${{ secrets.EVIDENCE_SOURCE__BIGQUERY_CONNECTION__CLIENT_EMAIL }}
           EVIDENCE_SOURCE__BIGQUERY_CONNECTION__LOCATION: ${{ secrets.EVIDENCE_SOURCE__BIGQUERY_CONNECTION__LOCATION }}
           EVIDENCE_SOURCE__BIGQUERY_CONNECTION__PRIVATE_KEY: ${{ secrets.EVIDENCE_SOURCE__BIGQUERY_CONNECTION__PRIVATE_KEY }}
           EVIDENCE_SOURCE__BIGQUERY_CONNECTION__PROJECT_ID: ${{ secrets.EVIDENCE_SOURCE__BIGQUERY_CONNECTION__PROJECT_ID }}
-          EVIDENCE_SECRET_DATASET_ID: ${{ secrets.EVIDENCE_SECRET_DATASET_ID }}
-          EVIDENCE_SECRET_PROJECT_ID: ${{ secrets.EVIDENCE_SECRET_PROJECT_ID }}
-          EVIDENCE_SECRET_TABLE_NAME: ${{ secrets.EVIDENCE_SECRET_TABLE_NAME }}
         run: |
+          cd reporting/
           npm run sources
           npm run build
 
