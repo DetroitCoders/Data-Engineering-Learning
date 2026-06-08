@@ -32,15 +32,22 @@ jobs:
           cd reporting/
           npm install
 
+      - name: Generate connection credentials
+        run: |
+          mkdir -p reporting/sources/bigquery_connection
+          CLIENT_EMAIL_B64=$(echo -n "${{ secrets.EVIDENCE_SOURCE__BIGQUERY_CONNECTION__CLIENT_EMAIL }}" | base64 -w 0)
+          PRIVATE_KEY_B64=$(echo -n "${{ secrets.EVIDENCE_SOURCE__BIGQUERY_CONNECTION__PRIVATE_KEY }}" | base64 -w 0)
+          PROJECT_ID_B64=$(echo -n "${{ secrets.EVIDENCE_SOURCE__BIGQUERY_CONNECTION__PROJECT_ID }}" | base64 -w 0)
+          
+          cat > reporting/sources/bigquery_connection/connection.options.yaml << EOF
+          client_email: $CLIENT_EMAIL_B64
+          private_key: $PRIVATE_KEY_B64
+          project_id: $PROJECT_ID_B64
+          EOF
+
       - name: build
         env:
           BASE_PATH: './build/${{ github.event.repository.name }}'
-          ## Add and uncomment any environment variables here
-          EVIDENCE_SOURCE__BIGQUERY_CONNECTION__AUTHENTICATOR: ${{ secrets.EVIDENCE_SOURCE__BIGQUERY_CONNECTION__AUTHENTICATOR }}
-          EVIDENCE_SOURCE__BIGQUERY_CONNECTION__CLIENT_EMAIL: ${{ secrets.EVIDENCE_SOURCE__BIGQUERY_CONNECTION__CLIENT_EMAIL }}
-          EVIDENCE_SOURCE__BIGQUERY_CONNECTION__LOCATION: ${{ secrets.EVIDENCE_SOURCE__BIGQUERY_CONNECTION__LOCATION }}
-          EVIDENCE_SOURCE__BIGQUERY_CONNECTION__PRIVATE_KEY: ${{ secrets.EVIDENCE_SOURCE__BIGQUERY_CONNECTION__PRIVATE_KEY }}
-          EVIDENCE_SOURCE__BIGQUERY_CONNECTION__PROJECT_ID: ${{ secrets.EVIDENCE_SOURCE__BIGQUERY_CONNECTION__PROJECT_ID }}
         run: |
           cd reporting/
           npm run sources
