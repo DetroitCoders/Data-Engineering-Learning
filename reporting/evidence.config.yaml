@@ -1,5 +1,5 @@
 deployment:
-  basePath: /Data-Engineering-Learning/reporting
+  basePath: /Data-Engineering-Learning
 
 appearance:
   default: system
